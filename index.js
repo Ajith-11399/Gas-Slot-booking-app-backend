@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./Database/config.js";
-import userRouter from "../Backend/Routes/userRoute.js";
+import userRoute from "../Backend/Routes/userRoute.js";
 
 dotenv.config();
 
@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
 });
 
 // API Routes
-app.use("/api/user", userRouter);
+app.use("/api/user", userRoute);
 
 // Listen
 app.listen(process.env.PORT, () => {
