@@ -28,17 +28,17 @@ The Gas Slot Booking App Backend handles user authentication, product selection,
 2. **User Registration**: Registers a new user.
 3. **User Login**: Authenticates a user for login.
 
-## Base URL 
+## Base URL
 
 **URL** : https://gas-slot-booking-app-backend.onrender.com/
 
 ## Routes
 
-| **Routes**                       | **Method** | **Endpoint**           | **Description**                              |
-| -------------------------------- | ---------- | ---------------------- | -------------------------------------------- |
-| [Home](#)                        | `GET`      | `/`                    | Displays a welcome message.                  |
-| [Register User](#)               | `POST`     | `/api/user/register`   | Registers a new user.                        |
-| [Login User](#)                  | `POST`     | `/api/user/login`      | Authenticates user login.                    |
+| **Routes**                                                                           | **Method** | **Endpoint**         | **Description**             |
+| ------------------------------------------------------------------------------------ | ---------- | -------------------- | --------------------------- |
+| [Home](https://gas-slot-booking-app-backend.onrender.com/)                           | `GET`      | `/`                  | Displays a welcome message. |
+| [Register User](https://gas-slot-booking-app-backend.onrender.com/api/user/register) | `POST`     | `/api/user/register` | Registers a new user.       |
+| [Login User](https://gas-slot-booking-app-backend.onrender.com/api/user/login)       | `POST`     | `/api/user/login`    | Authenticates user login.   |
 
 ## License
 
