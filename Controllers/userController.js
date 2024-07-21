@@ -2,6 +2,7 @@ import User from "../Models/userSchema.js";
 import Booking from "../Models/bookingSchema.js";
 import bcryptjs from "bcryptjs";
 import dotenv from "dotenv";
+import Razorpay from "razorpay";
 
 dotenv.config();
 
@@ -50,19 +51,74 @@ export const loginUser = async (req, res) => {
 
 export const bookGas = async (req, res) => {
   try {
-    console.log("Request Body:", req.body); 
     const { email, product, quantity, fullName, address, date, timeSlot, phoneNumber, totalPrice } = req.body;
-
     if (!email || !product || !quantity || !fullName || !address || !date || !timeSlot || !phoneNumber || !totalPrice) {
       return res.status(400).json({ message: "All fields are mandatory!" });
     }
 
-    const newBooking = new Booking({ email, product, quantity, fullName, address, date, timeSlot, phoneNumber, totalPrice });
+    const newBooking = new Booking({
+      email,
+      product,
+      quantity,
+      fullName,
+      address,
+      date,
+      timeSlot,
+      phoneNumber,
+      totalPrice,
+      paymentStatus: "Pending", 
+    });
     await newBooking.save();
 
-    res.status(200).json({ message: "Your order has been placed successfully!" });
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZOR_PAY_ID,
+      key_secret: process.env.RAZOR_PAY_SECRET_KEY,
+    });
+    
+    const options = {
+      amount: Number(totalPrice) * 100,
+      currency: "INR",
+      receipt: newBooking._id.toString(),
+      payment_capture: 1,
+    };
+
+    const order = await razorpay.orders.create(options);
+
+    if (!order || order.status !== 'created') {
+      return res.status(500).json({ message: "Error in placing Razorpay order!" });
+    }
+    
+    res.status(200).json({
+      message: "Your order has been placed successfully!",
+      order,
+    });
   } catch (error) {
-    console.error(error); 
-    res.status(500).json({ message: "Booking was failed!" });
+    console.error("Error in bookAndPay:", error);
+    res.status(500).json({ message: "An error occurred while placing the order!" });
+  }
+};
+
+
+export const razorpayWebhook = async (req, res) => {
+  try {
+    const { payload } = req.body;
+
+    if (payload.event === "payment.captured") {
+      const { order_id } = payload.payload.payment.entity;
+      const booking = await Booking.findOne({ _id: order_id });
+
+      if (booking) {
+        booking.paymentStatus = "Paid";
+        await booking.save();
+        res.status(200).json({ message: "Payment status updated" });
+      } else {
+        res.status(404).json({ message: "Booking not found" });
+      }
+    } else {
+      res.status(400).json({ message: "Event not handled" });
+    }
+  } catch (error) {
+    console.error("Error in razorpayWebhook:", error);
+    res.status(500).json({ message: "Error in webhook handler" });
   }
 };

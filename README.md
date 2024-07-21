@@ -8,25 +8,33 @@ The Gas Slot Booking App Backend handles user authentication, product selection,
 
 ## Files Structure
 
-- **userController.js**: Contains the controller functions for handling user registration and authentication.
+- **userController.js**: Contains the controller functions for handling user registration, authentication and booking
 - **userRouter.js**: Defines routes for user-related operations.
 - **index.js**: Main entry point of the application.
+- **config.js**: Establishes a connection to Database.
+- **userSchema.js**: Schema for User credentials.
+- **bookingSchema.js**: Schema for booking a gas product.
 - **.env**: Environment configuration file for MongoDB connection and SMTP settings.
 
 ## Tools and Libraries Used
 
-- **Node.js**: JavaScript runtime environment.
-- **Express**: Web application framework for Node.js.
-- **MongoDB**: NoSQL database for storing user and booking data.
-- **bcryptjs**: Library for hashing passwords.
-- **dotenv**: Module for loading environment variables from a `.env` file.
-- **nodemailer**: Library for sending emails for user notifications.
+- **bcryptjs**: Library for hashing passwords. Version: ^2.4.3
+- **cors**: Middleware for enabling Cross-Origin Resource Sharing (CORS). Version: ^2.8.5
+- **dotenv**: Module for loading environment variables from a .env file. Version: ^16.4.5
+- **express**: Web application framework for Node.js. Version: ^4.19.2
+- **jsonwebtoken**: Library for generating and verifying JSON Web Tokens (JWT). Version: ^9.0.2
+- **mongoose**: Object Data Modeling (ODM) library for MongoDB and Node.js. Version: ^8.4.3
+- **nodemailer**: Library for sending emails for user notifications. Version: ^6.9.14
+- **nodemon**: Utility that monitors changes in your Node.js application and automatically restarts the server. Version: ^3.1.3
+- **razorpay**: Node.js library for integrating the Razorpay payment gateway. Version: ^2.9.4
 
 ## Operations
 
 1. **Home**: Displays a welcome message.
 2. **User Registration**: Registers a new user.
 3. **User Login**: Authenticates a user for login.
+4. **Gas Booking**: Booking a product.
+5. **Updating payment status**: Updating payment status from default 'Pending' to
 
 ## Base URL
 
@@ -34,11 +42,12 @@ The Gas Slot Booking App Backend handles user authentication, product selection,
 
 ## Routes
 
-| **Routes**                                                                                | **Method** | **Endpoint**              | **Description**             |
-| ----------------------------------------------------------------------------------------- | ---------- | ------------------------- | --------------------------- |
-| [Home](https://gas-slot-booking-app-backend.onrender.com/)                                | `GET`      | `/`                       | Displays a welcome message. |
-| [Register User](https://gas-slot-booking-app-backend.onrender.com/api/user/register-user) | `POST`     | `/api/user/register-user` | Registers a new user.       |
-| [Login User](https://gas-slot-booking-app-backend.onrender.com/api/user/login-user)       | `POST`     | `/api/user/login-user`    | Authenticates user login.   |
+| **Route**                 | **Method** | **Endpoint**             | **Description**                              |
+| ------------------------- | ---------- | ------------------------ | -------------------------------------------- |
+| **Register User**         | `POST`     | `/register-user`         | Registers a new user.                        |
+| **Login User**            | `POST`     | `/login-user`            | Authenticates user login.                    |
+| **Book Gas**              | `POST`     | `/booking`               | Books a gas delivery slot.                   |
+| **Update Payment Status** | `POST`     | `/update-payment-status` | Updates payment status via Razorpay webhook. |
 
 ## License
 
