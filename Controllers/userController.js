@@ -57,7 +57,6 @@ export const bookGas = async (req, res) => {
       return res.status(400).json({ message: "All fields are mandatory!" });
     }
 
-    // Create a new booking record in the database
     const newBooking = new Booking({
       email,
       product,
@@ -72,15 +71,13 @@ export const bookGas = async (req, res) => {
     });
     await newBooking.save();
 
-    // Initialize Razorpay instance
     const razorpay = new Razorpay({
       key_id: process.env.RAZOR_PAY_ID,
       key_secret: process.env.RAZOR_PAY_SECRET_KEY,
     });
 
-    // Create an order in Razorpay
     const options = {
-      amount: Number(totalPrice) * 100, // amount in the smallest currency unit
+      amount: Number(totalPrice) * 100,
       currency: "INR",
       receipt: newBooking._id.toString(),
       payment_capture: 1,
@@ -92,7 +89,7 @@ export const bookGas = async (req, res) => {
       return res.status(500).json({ message: "Error in placing Razorpay order!" });
     }
 
-    // Save the Razorpay order ID in the booking record
+    
     newBooking.razorpayOrderId = order.id;
     await newBooking.save();
 
@@ -100,8 +97,6 @@ export const bookGas = async (req, res) => {
       message: "Your order has been placed successfully!",
       order,
     });
-    console.log("Razorpay Key ID:", process.env.RAZOR_PAY_ID);
-    console.log("Razorpay Secret Key:", process.env.RAZOR_PAY_SECRET_KEY);
 
     console.log(newBooking);
   } catch (error) {
