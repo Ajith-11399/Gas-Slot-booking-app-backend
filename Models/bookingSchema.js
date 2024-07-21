@@ -1,21 +1,26 @@
 import mongoose from "mongoose";
 
-const bookingSchema = new mongoose.Schema({
-  product: { type: String },
-  fullName: { type: String },
-  email: { type: String },
-  date: { type: String },
-  timeSlot: { type: String },
-  address: { type: String },
-  quantity: { type: Number },
-  phoneNumber: { type: String },
-  totalPrice: { type: Number },
-  paymentStatus: { type: String, default: "Pending" }
-}, { timestamps: true });
-
-
-bookingSchema.index({ email: 1 });
-bookingSchema.index({ product: 1 });
+const bookingSchema = new mongoose.Schema(
+  {
+    email: String,
+    product: String,
+    quantity: Number,
+    fullName: String,
+    address: String,
+    date: String,
+    timeSlot: String,
+    phoneNumber: String,
+    totalPrice: Number,
+    paymentStatus: {
+      type: String,
+      default: "Pending",
+    },
+    razorpayOrderId: String,
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const Booking = mongoose.model("Booking", bookingSchema);
 

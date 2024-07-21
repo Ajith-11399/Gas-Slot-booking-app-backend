@@ -52,10 +52,12 @@ export const loginUser = async (req, res) => {
 export const bookGas = async (req, res) => {
   try {
     const { email, product, quantity, fullName, address, date, timeSlot, phoneNumber, totalPrice } = req.body;
+
     if (!email || !product || !quantity || !fullName || !address || !date || !timeSlot || !phoneNumber || !totalPrice) {
       return res.status(400).json({ message: "All fields are mandatory!" });
     }
 
+    // Create a new booking record in the database
     const newBooking = new Booking({
       email,
       product,
@@ -66,17 +68,19 @@ export const bookGas = async (req, res) => {
       timeSlot,
       phoneNumber,
       totalPrice,
-      paymentStatus: "Pending", 
+      paymentStatus: "Pending",
     });
     await newBooking.save();
 
+    // Initialize Razorpay instance
     const razorpay = new Razorpay({
       key_id: process.env.RAZOR_PAY_ID,
       key_secret: process.env.RAZOR_PAY_SECRET_KEY,
     });
-    
+
+    // Create an order in Razorpay
     const options = {
-      amount: Number(totalPrice) * 100,
+      amount: Number(totalPrice) * 100, // amount in the smallest currency unit
       currency: "INR",
       receipt: newBooking._id.toString(),
       payment_capture: 1,
@@ -87,13 +91,21 @@ export const bookGas = async (req, res) => {
     if (!order || order.status !== 'created') {
       return res.status(500).json({ message: "Error in placing Razorpay order!" });
     }
-    
+
+    // Save the Razorpay order ID in the booking record
+    newBooking.razorpayOrderId = order.id;
+    await newBooking.save();
+
     res.status(200).json({
       message: "Your order has been placed successfully!",
       order,
     });
+    console.log("Razorpay Key ID:", process.env.RAZOR_PAY_ID);
+    console.log("Razorpay Secret Key:", process.env.RAZOR_PAY_SECRET_KEY);
+
+    console.log(newBooking);
   } catch (error) {
-    console.error("Error in bookAndPay:", error);
+    console.error("Error in bookGas:", error);
     res.status(500).json({ message: "An error occurred while placing the order!" });
   }
 };
@@ -101,11 +113,11 @@ export const bookGas = async (req, res) => {
 
 export const razorpayWebhook = async (req, res) => {
   try {
-    const { payload } = req.body;
+    const { event, payload } = req.body;
 
-    if (payload.event === "payment.captured") {
-      const { order_id } = payload.payload.payment.entity;
-      const booking = await Booking.findOne({ _id: order_id });
+    if (event === "payment.captured") {
+      const { order_id } = payload.payment.entity;
+      const booking = await Booking.findOne({ razorpayOrderId: order_id });
 
       if (booking) {
         booking.paymentStatus = "Paid";
@@ -122,3 +134,4 @@ export const razorpayWebhook = async (req, res) => {
     res.status(500).json({ message: "Error in webhook handler" });
   }
 };
+
